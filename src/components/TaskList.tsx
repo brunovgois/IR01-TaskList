@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 
 import '../styles/tasklist.scss'
 
@@ -10,12 +10,23 @@ interface Task {
   isComplete: boolean;
 }
 
-export function TaskList() {
+export const TaskList = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState('');
 
-  function handleCreateNewTask() {
-    // Crie uma nova task com um id random, não permita criar caso o título seja vazio.
+  const handleCreateNewTask = (e: FormEvent) => {
+    e.preventDefault();
+
+    if(!newTaskTitle) return;
+
+    const newTask = {
+      id: Math.random(),
+      title: newTaskTitle,
+      isComplete: false,
+    }
+
+    setTasks(oldTasks => [...oldTasks, newTask]);
+    setNewTaskTitle('');
   }
 
   function handleToggleTaskCompletion(id: number) {
@@ -32,15 +43,17 @@ export function TaskList() {
         <h2>Minhas tasks</h2>
 
         <div className="input-group">
-          <input 
-            type="text" 
-            placeholder="Adicionar novo todo" 
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            value={newTaskTitle}
-          />
-          <button type="submit" data-testid="add-task-button" onClick={handleCreateNewTask}>
-            <FiCheckSquare size={16} color="#fff"/>
-          </button>
+          <form onSubmit={handleCreateNewTask}>
+            <input 
+              type="text" 
+              placeholder="Adicionar novo todo" 
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              value={newTaskTitle}
+            />
+            <button type="submit" data-testid="add-task-button">
+              <FiCheckSquare size={16} color="#fff"/>
+            </button>
+          </form>
         </div>
       </header>
 
